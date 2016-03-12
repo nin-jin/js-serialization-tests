@@ -98,12 +98,16 @@ suite
   console.log(String(event.target));
 })
 .on('complete', function(event) {
-  console.log('Fastest is ' + this.filter('fastest').map('name'));
+  var fastest = this.filter(function(bench){
+    return (bench.name.indexOf('roundtrip') != -1)
+  }).filter('fastest').map('name')
+  console.log('Fastest is ' + fastest);
   console.log("==================================== Sizes =====================================");
 
   for (i = 0; i < event.currentTarget.length; i++) {
     if ( event.currentTarget[i].name.indexOf('encode') != -1 ){
-     console.log(event.currentTarget[i].name + ' - ' + event.currentTarget[i]._size + ' bytes');
+      var name = event.currentTarget[i].name.substring(0, event.currentTarget[i].name.indexOf('#'))
+      console.log(name + ' - ' + event.currentTarget[i]._size + ' bytes');
     }
   }
 
