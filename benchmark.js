@@ -1,6 +1,7 @@
 var Benchmark     = require('benchmark');
 var jsondiffpatch = require('jsondiffpatch').create({});
 
+var Tree          = require('mol_tree').$mol_tree;
 var CBOR          = require('cbor-js');
 var msgpack       = require("msgpack-lite");
 var pako          = require('pako');
@@ -18,17 +19,30 @@ var BSON          = new bson.BSONNative.BSON([
   bson.MinKey
 ]);
 
+var treeStrData   = require('fs').readFileSync('./test.tree');
 var jsonData      = require('./test.json');
 var pakedData     = pako.deflate(JSON.stringify(jsonData), { to: 'string'});
 var stringData    = JSON.stringify(jsonData)
 var msgpackData   = msgpack.encode(jsonData);
 var cborData      = CBOR.encode(jsonData);
 var bsonData      = BSON.serialize(stringData, null, true);
+var treeData      = Tree.fromString(treeStrData);
 
 var suite         = new Benchmark.Suite
 
 // add tests
 suite
+.add('Tree#test__________________encode', function() {
+  var buf = treeData.toString();
+  
+  this["_size"] = buf.length;
+})
+.add('Tree#test__________________decode', function() {
+    Tree.fromString(treeStrData);
+})
+.add('Tree#test__________________roundtrip', function() {
+    this['_data'] = Tree.fromString(treeData.toString());
+})
 .add('Json#test__________________encode', function() {
   var buf = JSON.stringify(jsonData);
 
